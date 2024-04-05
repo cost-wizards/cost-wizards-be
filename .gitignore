@@ -2,3 +2,4 @@
 .idea/
 build/
 cost_wizards.egg-info/
+*__pycache__/
