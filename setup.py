@@ -18,5 +18,11 @@ setup(
         "botocore==1.34.78",
         "pandas==1.3.4",
         "pydantic-settings==2.2.1",
-    ]
+        "SQLAlchemy==1.4.25",
+        "fastapi",
+        "uvicorn==0.27.1",
+        "psycopg2-binary==2.9.9",
+        "alembic==1.7.3",
+        "SQLAlchemy-Utils==0.37.8",
+    ],
 )

@@ -1,10 +1,7 @@
 def get_prompt(columns, data, instance):
 
     example_json = {
-        "CurrentInstance": {
-            "Instance": "t3.nano",
-            "CostPerHour": 0.345
-        },
+        "CurrentInstance": {"Instance": "t3.nano", "CostPerHour": 0.345},
         "SuggestedInstances": [
             {
                 "Instance": "t3.nano",
@@ -12,8 +9,8 @@ def get_prompt(columns, data, instance):
                 "CostDifferenceCostPerHour": {
                     "CurrentCostPerHour": 0.0052,
                     "SuggestedCostPerHour": 0.0104,
-                    "DifferenceCostPerHour": 0.0052
-                }
+                    "DifferenceCostPerHour": 0.0052,
+                },
             },
             {
                 "Instance": "t3.small",
@@ -21,10 +18,10 @@ def get_prompt(columns, data, instance):
                 "CostDifferencePerHour": {
                     "CurrentCostPerHour": 0.0052,
                     "SuggestedCostPerHour": 0.0208,
-                    "DifferenceCostPerHour": 0.0156
-                }
-            }
-        ]
+                    "DifferenceCostPerHour": 0.0156,
+                },
+            },
+        ],
     }
     return f"""
             The dataset you will be working with is framed within <data> tags, featuring time series data structured into columns {columns}. 
