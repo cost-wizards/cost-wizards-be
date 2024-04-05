@@ -14,6 +14,7 @@ class EnvSettings(BaseSettings):
     db_name: str
     db_port: str
     db_host_name: str
+    aws_region_name: str
 
     class Config:
         env_file = ".env"

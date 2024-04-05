@@ -1,18 +1,7 @@
-def get_prompt():
-    columns = f"""timestamp,Average_CPUUtilization,Maximum_CPUUtilization,Minimum_CPUUtilization"""
-    data = f"""
-                timestamp,Average_CPUUtilization,Maximum_CPUUtilization,Minimum_CPUUtilization
-                2024-03-10,0.2393241832,0.5084095948,0.2083472231
-                2024-03-11,0.2198618488,0.2499333511,0.1999533442
-                2024-03-12,0.2630860413,2.760357596,0.1999666722
-                2024-03-13,0.2329128924,0.366568915,0.1917145953
-                """
-    instance = "t3.nano"
+def get_prompt(columns, data, instance):
+
     example_json = {
-        "CurrentInstance": {
-            "Instance": "t3.nano",
-            "CostPerHour": 0.345
-        },
+        "CurrentInstance": {"Instance": "t3.nano", "CostPerHour": 0.345},
         "SuggestedInstances": [
             {
                 "Instance": "t3.nano",
@@ -20,8 +9,8 @@ def get_prompt():
                 "CostDifferenceCostPerHour": {
                     "CurrentCostPerHour": 0.0052,
                     "SuggestedCostPerHour": 0.0104,
-                    "DifferenceCostPerHour": 0.0052
-                }
+                    "DifferenceCostPerHour": 0.0052,
+                },
             },
             {
                 "Instance": "t3.small",
@@ -29,51 +18,55 @@ def get_prompt():
                 "CostDifferencePerHour": {
                     "CurrentCostPerHour": 0.0052,
                     "SuggestedCostPerHour": 0.0208,
-                    "DifferenceCostPerHour": 0.0156
-                }
-            }
-        ]
+                    "DifferenceCostPerHour": 0.0156,
+                },
+            },
+        ],
     }
-    prompt = f"""
-                You will receive time series data with columns {columns} enclosed within the <data> tags. 
-                Additionally, within the <instance> tags, you'll find the type of instance used to generate this time series data.
+    return f"""
+            The dataset you will be working with is framed within <data> tags, featuring time series data structured into columns {columns}. 
+            
+            Additionally, details regarding the EC2 instance type that was employed to generate this dataset are encapsulated within <instance> tags.
 
-                Your objective is to analyze these values and recommend a more cost-effective EC2 instance type for optimization.
+            Your task is to conduct a comprehensive analysis of the provided datasets, with a specific focus on evaluating the array of available EC2 instance types. 
+            
+            This analysis should aim to identify a more cost-effective EC2 instance type that could serve as an optimized solution. 
+            
+            In instances where the current EC2 instance type is deemed to be performing at an optimal level of efficiency, it is recommended to endorse the continuation of its use, justifying that the present EC2 instance type remains the most suited for the task.
 
-                Please provide at least two EC2 instance suggestions. The output format should strictly adhere to JSON format. 
-                An example of the JSON format is provided within <json_example_format> tags below.
+            Please ensure to recommend a minimum of two alternative EC2 instance types. Your recommendations should be presented in a strict JSON only format, as illustrated within the <json_example_format> tags provided below.             
 
-                <json_example_format>
+            <json_example_format>
+            {{
+              "CurrentInstance": {{
+                "Instance": "{example_json["CurrentInstance"]["Instance"]}",
+                "CostPerHour": {example_json["CurrentInstance"]["CostPerHour"]}
+              }},
+              "SuggestedInstances": [
                 {{
-                  "CurrentInstance": {{
-                    "Instance": "{example_json["CurrentInstance"]["Instance"]}",
-                    "CostPerHour": {example_json["CurrentInstance"]["CostPerHour"]}
-                  }},
-                  "SuggestedInstances": [
-                    {{
-                      "Instance": "{example_json["SuggestedInstances"][0]["Instance"]}",
-                      "Reason": "{example_json["SuggestedInstances"][0]["Reason"]}",
-                      "CostDifferenceCostPerHour": {{
-                        "CurrentCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
-                        "SuggestedCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
-                        "DifferenceCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
-                      }}
-                    }},
-                    {{
-                      "Instance": "{example_json["SuggestedInstances"][1]["Instance"]}",
-                      "Reason": "{example_json["SuggestedInstances"][1]["Reason"]}",
-                      "CostDifferencePerHour": {{
-                        "CurrentCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferencePerHour"]["CurrentCostPerHour"]},
-                        "SuggestedCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferencePerHour"]["SuggestedCostPerHour"]},
-                        "DifferenceCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferencePerHour"]["DifferenceCostPerHour"]}
-                      }}
-                    }}
-                  ]
+                  "Instance": "{example_json["SuggestedInstances"][0]["Instance"]}",
+                  "Reason": "{example_json["SuggestedInstances"][0]["Reason"]}",
+                  "CostDifferenceCostPerHour": {{
+                    "CurrentCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
+                    "SuggestedCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
+                    "DifferenceCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
+                  }}
+                }},
+                {{
+                  "Instance": "{example_json["SuggestedInstances"][1]["Instance"]}",
+                  "Reason": "{example_json["SuggestedInstances"][1]["Reason"]}",
+                  "CostDifferencePerHour": {{
+                    "CurrentCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferencePerHour"]["CurrentCostPerHour"]},
+                    "SuggestedCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferencePerHour"]["SuggestedCostPerHour"]},
+                    "DifferenceCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferencePerHour"]["DifferenceCostPerHour"]}
+                  }}
                 }}
-                <json_example_format>
+              ]
+            }}
+            <json_example_format>
 
-                <data>{data}<data>
+            <data>{data}<data>
 
-                <instance>{instance}<instance>
+            <instance>{instance}<instance>
 
-                """
+            """
