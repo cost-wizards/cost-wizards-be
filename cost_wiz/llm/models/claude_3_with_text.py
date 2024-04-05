@@ -1,3 +1,4 @@
+import re
 import json
 from botocore.exceptions import ClientError
 
@@ -36,9 +37,10 @@ class Claude3Wrapper:
             self.logger.success(f"- The model returned {len(output_list)} response(s):")
             for output in output_list:
                 self.logger.info(output["text"])
-
-            return result
-
+            if '```json' in output_list[0]["text"]:
+                return json.loads(re.search(r'```json(.*?)```', output_list[0]["text"], re.DOTALL).group(1).strip())
+            else:
+                return json.loads(output_list[0]["text"])
         except ClientError as err:
             self.logger.error(
                 "Couldn't invoke Claude 3 Sonnet. Here's why: %s: %s",
