@@ -19,6 +19,7 @@ class Account(Base):
     access_key = Column(String)
     secret_key = Column(String)
     region = Column(String)
+    session_key = Column(String)
 
     has_account_setup = Column(Boolean)
 
@@ -43,16 +44,29 @@ class InstanceStat(Base):
     __tablename__ = "instance_stats"
 
     id = Column(Integer, primary_key=True)
-    instance_id = Column(Integer, ForeignKey("instance.id"))
+    instance_id = Column(String)
 
-    mem_used_percent = Column(Float)
-    cpu_usage_iowait = Column(Float)
-    cpu_usage_idle = Column(Float)
-    cpu_usage_system = Column(Float)
-    diskio_reads = Column(Float)
-    cpu_usage_user = Column(Float)
-    disk_used_percent = Column(Float)
-    swap_used_percent = Column(Float)
+    mem_used_percent_max = Column(Float)
+    cpu_usage_user_max = Column(Float)
+
+    cpu_usage_iowait_max = Column(Float)
+    cpu_usage_idle_max = Column(Float)
+    cpu_usage_system_max = Column(Float)
+    diskio_reads_max = Column(Float)
+
+    disk_used_percent_max = Column(Float)
+    swap_used_percent_max = Column(Float)
+
+    mem_used_percent_min = Column(Float)
+    cpu_usage_user_min = Column(Float)
+
+    cpu_usage_iowait_min = Column(Float)
+    cpu_usage_idle_min = Column(Float)
+    cpu_usage_system_min = Column(Float)
+    diskio_reads_min = Column(Float)
+
+    disk_used_percent_min = Column(Float)
+    swap_used_percent_min = Column(Float)
 
     timestamp = Column(DateTime)
 
@@ -63,7 +77,7 @@ class Recommendation(Base):
 
     id = Column(Integer, primary_key=True)
 
-    instance_id = Column(Integer, ForeignKey("instance.id"))
+    current_instance = Column(Integer, ForeignKey("instance.id"))
 
     sug_1_instance_type = Column(String)
     sug_1_reason = Column(String)
