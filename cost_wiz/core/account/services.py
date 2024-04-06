@@ -25,8 +25,6 @@ class AccountService:
             .group_by(Account.id, Account.name)
         )
 
-        print(query.all())
-
         parsed_data = []
 
         for data in query.all():
@@ -37,10 +35,10 @@ class AccountService:
 
             total_cost_for_ec2 = 0
 
-            try:
-                total_cost_for_ec2 = billing_data(access_key, secret_key, session_key, region)
-            except:
-                pass
+            # try:
+            #     total_cost_for_ec2 = billing_data(access_key, secret_key, session_key, region)
+            # except:
+            #     pass
 
             parsed_data.append(
                 {

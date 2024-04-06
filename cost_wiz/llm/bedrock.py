@@ -16,6 +16,8 @@ def get_text(columns, data, instance):
     )
     wrapper = Claude3Wrapper(client, logger)
     prompt = get_prompt(columns=columns, data=data, instance=instance)
+    with open("prmotp.txt", "a+") as file:
+        file.writelines(prompt)
     return wrapper.invoke_claude_3_with_text(prompt)
 
 
@@ -28,4 +30,4 @@ def get_text(columns, data, instance):
 #             2024-03-13,0.2329128924,0.366568915,0.1917145953
 #         """
 # instance = "t3.nano"
-# gg = get_text(columns=columns, data=data, instance=instance, logger=logger)
+# gg = get_text(columns=columns, data=data, instance=instance)

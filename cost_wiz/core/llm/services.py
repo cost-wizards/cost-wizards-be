@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from cost_wiz.core.instances.services import InstanceService
@@ -14,29 +15,36 @@ class LLMService:
         instance = instance_service.get_instance(session, account_id=account_id, instance_id=instance_id)
 
         today = datetime.now()
-        days_30_before = today - timedelta(days=30)
+        days_30_before = today - timedelta(days=90)
 
-        data = (
-            session.query(InstanceStat)
-            .filter(
-                InstanceStat.timestamp > days_30_before,
-                InstanceStat.timestamp < today,
-                InstanceStat.instance_id == instance_id,
+        query = (
+            session.query(
+                InstanceStat.timestamp,
+                func.avg(InstanceStat.avg_cpu_usage).label("avg_cpu_usage"),
+                func.max(InstanceStat.max_cpu_usage).label("max_cpu_usage"),
+                func.min(InstanceStat.min_cpu_usage).label("min_cpu_usage"),
+                func.avg(InstanceStat.avg_mem_usage).label("avg_mem_usage"),
+                func.max(InstanceStat.max_mem_usage).label("max_mem_usage"),
+                func.min(InstanceStat.min_mem_usage).label("min_mem_usage"),
             )
-            .all()
+            .filter(InstanceStat.timestamp.between(days_30_before, today))
+            .group_by(InstanceStat.timestamp)
         )
-        print(data, "=" * 10)
 
-        columns = "timestamp, avg_cpu_usage, max_cpu_usage, min_cpu_usage, avg_mem_usage, max_mem_usage, min_mem_usage, avg_network_in, max_network_in, min_network_in, min_network_out, avg_network_out, max_network_out"
-        _data = ""
+        data = query.all()
+
+        columns = (
+            "timestamp, avg_cpu_usage, max_cpu_usage, min_cpu_usage, avg_mem_usage, max_mem_usage, min_mem_usage, n"
+        )
+        _data = "" + columns
 
         for d in data:
-            _data += f"{d.timestamp}, {d.avg_cpu_usage}, {d.max_cpu_usage}, {d.min_cpu_usage}, {d.avg_mem_usage}, {d.max_mem_usage}, {d.min_mem_usage}, {d.avg_network_in}, {d.max_network_in}, {d.min_network_in}, {d.min_network_out}, {d.avg_network_out}, {d.max_network_out}\n"
+            _data += f"{d.timestamp}, {d.avg_cpu_usage}, {d.max_cpu_usage}, {d.min_cpu_usage}, {d.avg_mem_usage}, {d.max_mem_usage}, {d.min_mem_usage}\n"
 
         instance = instance.instance_type
 
         try:
             response = get_text(columns, _data, instance)
             return response
-        except:
+        except Exception as e:
             raise HTTPException(status_code=400, detail="Could not process the request at the moment")
