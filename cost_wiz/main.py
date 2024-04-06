@@ -5,6 +5,7 @@ import alembic.config
 from cost_wiz.core.account.views import router as account_router
 from cost_wiz.core.instances.views import router as instance_router
 from cost_wiz.core.llm.views import router as llm_router
+from cost_wiz.core.stats.views import router as stat_router
 
 app = FastAPI()
 # app.add_middleware(
@@ -18,6 +19,7 @@ app = FastAPI()
 app.include_router(account_router)
 app.include_router(instance_router)
 app.include_router(llm_router)
+app.include_router(stat_router)
 
 
 # @app.on_event("startup")
