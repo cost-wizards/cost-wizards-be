@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-
+from typing import List
 from cost_wiz.core.account.services import AccountService
 from cost_wiz.core.instances.schema import InstanceRequestSchema
 from cost_wiz.db import Account, Instance
@@ -21,19 +21,16 @@ class InstanceService:
         }
 
         ec2_instances: list[dict] = get_instances(**params)
-        print(ec2_instances)
 
         return ec2_instances
 
     def get_instances(self, session: Session, account_service: AccountService, *, account_id: int):
-        _account = account_service.get_account(session, id=account_id)
 
-        _instances = session.query(Instance).filter(Instance.account_id == _account.id).all()
+        _instances = session.query(Instance).filter(Instance.account_id == account_id).all()
 
         return _instances
 
-    def get_instance(self, session: Session, account_service: AccountService, *, account_id: int, instance_id: int):
-        account_service.get_account(session, id=account_id)
+    def get_instance(self, session: Session, *, account_id: int, instance_id: int):
 
         _instance = (
             session.query(Instance).filter(Instance.id == instance_id, Instance.account_id == account_id).one_or_none()
@@ -49,7 +46,7 @@ class InstanceService:
         session: Session,
         account_service: AccountService,
         *,
-        payload: list[InstanceRequestSchema],
+        payload: List[InstanceRequestSchema],
         account_id: int
     ):
 

@@ -44,9 +44,5 @@ class Claude3Wrapper:
             else:
                 return json.loads(output_list[0]["text"])
         except ClientError as err:
-            self.logger.error(
-                "Couldn't invoke Claude 3 Sonnet. Here's why: %s: %s",
-                err.response["Error"]["Code"],
-                err.response["Error"]["Message"],
-            )
+            self.logger.error(f"Couldn't invoke Claude 3 Sonnet. Here's why: {err}")
             raise err

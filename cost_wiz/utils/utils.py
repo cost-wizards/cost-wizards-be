@@ -61,18 +61,27 @@ def billing_data(access_key, secret_key, session_token, region):
     start_date = datetime.datetime.utcnow() - datetime.timedelta(days=2)  # Example: last 30 days
     end_date = datetime.datetime.utcnow()
 
-    # Format the dates as strings
-    start_date_str = start_date.strftime("%Y-%m-%d")
-    end_date_str = end_date.strftime("%Y-%m-%d")
+    request_params = {
+        "TimePeriod": {"Start": start_date.strftime("%Y-%m-%d"), "End": end_date.strftime("%Y-%m-%d")},
+        "Granularity": "MONTHLY",  # You can adjust the granularity as needed
+        "Metrics": ["UnblendedCost"],
+        "GroupBy": [{"Type": "DIMENSION", "Key": "SERVICE"}, {"Type": "DIMENSION", "Key": "INSTANCE_TYPE"}],
+        "Filter": {
+            "Dimensions": {"Key": "SERVICE", "Values": ["Amazon Elastic Compute Cloud - Compute"]}
+        },  # Filter by EC2 service
+    }
 
-    # Retrieve billing information
-    response = ce_client.get_cost_and_usage(
-        TimePeriod={"Start": start_date_str, "End": end_date_str},
-        Granularity="DAILY",  # You can change the granularity as needed (e.g., HOURLY, MONTHLY)
-        Metrics=["BlendedCost"],  # You can specify other metrics like UnblendedCost, AmortizedCost, etc.
-    )
+    # Get the cost and usage data
+    response = ce_client.get_cost_and_usage(**request_params)
 
-    # Print the billing information
+    total = 0
+    # Process the response to extract cost data for EC2 instances
     for result_by_time in response["ResultsByTime"]:
-        total_cost = result_by_time["Total"]["BlendedCost"]["Amount"]
-        print(f"Date: {result_by_time['TimePeriod']['Start']} - Total Cost: {total_cost}")
+        for group in result_by_time["Groups"]:
+            cost = group["Metrics"]["UnblendedCost"]["Amount"]
+            try:
+                total += int(cost)
+            except:
+                total += 0
+
+    return total
