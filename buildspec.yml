@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    run-as: root
+    # runtime-versions:
+    #   docker: 20
+
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - REPOSITORY_URI=$ECR_REPOSITORY
+      - aws ecr get-login-password --region=$AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPO_URL
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+  build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo "Create task file"
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_DEFINITION_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - cat imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
