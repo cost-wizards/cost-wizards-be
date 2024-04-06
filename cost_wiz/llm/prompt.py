@@ -24,7 +24,7 @@ def get_prompt(columns, data, instance):
         ],
     }
     return f"""
-            The dataset you will be working with is framed within <data> tags, featuring time series data structured into columns {columns}. 
+            The dataset you will be working with is framed within <data> tags, featuring time series data structured into columns: {columns}. 
             
             Additionally, details regarding the EC2 instance type that was employed to generate this dataset are encapsulated within <instance> tags.
 
