@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from cost_wiz.config.settings import env
 
 engine = create_engine(env.get_db_url())
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -31,11 +32,12 @@ class Instance(Base):
     name = Column(String)
     instance_id = Column(String)
     instance_type = Column(String)
-    cpu = Column(String)
-    ram = Column(String)
-    status = Column(String)
-    hourly_rate = Column(Float)
+    vcpu = Column(String)
+    instance_memory = Column(String)
+    network_performance = Column(String)
+    on_demand_price = Column(String)
 
+    status = Column(String)
     account_id = Column(Integer, ForeignKey("account.id"))
 
 
@@ -46,27 +48,21 @@ class InstanceStat(Base):
     id = Column(Integer, primary_key=True)
     instance_id = Column(String)
 
-    mem_used_percent_max = Column(Float)
-    cpu_usage_user_max = Column(Float)
+    avg_cpu_usage = Column(Float)
+    max_cpu_usage = Column(Float)
+    min_cpu_usage = Column(Float)
 
-    cpu_usage_iowait_max = Column(Float)
-    cpu_usage_idle_max = Column(Float)
-    cpu_usage_system_max = Column(Float)
-    diskio_reads_max = Column(Float)
+    avg_mem_usage = Column(Float)
+    max_mem_usage = Column(Float)
+    min_mem_usage = Column(Float)
 
-    disk_used_percent_max = Column(Float)
-    swap_used_percent_max = Column(Float)
+    avg_network_in = Column(Float)
+    max_network_in = Column(Float)
+    min_network_in = Column(Float)
 
-    mem_used_percent_min = Column(Float)
-    cpu_usage_user_min = Column(Float)
-
-    cpu_usage_iowait_min = Column(Float)
-    cpu_usage_idle_min = Column(Float)
-    cpu_usage_system_min = Column(Float)
-    diskio_reads_min = Column(Float)
-
-    disk_used_percent_min = Column(Float)
-    swap_used_percent_min = Column(Float)
+    min_network_out = Column(Float)
+    avg_network_out = Column(Float)
+    max_network_out = Column(Float)
 
     timestamp = Column(DateTime)
 
