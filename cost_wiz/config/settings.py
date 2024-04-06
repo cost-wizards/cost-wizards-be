@@ -22,7 +22,7 @@ class EnvSettings(BaseSettings):
 
     def get_db_url(self):
         SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-        return SQLALCHEMY_DATABASE_URL
+        # return SQLALCHEMY_DATABASE_URL
         return f"postgresql+psycopg2://{self.db_username}:{self.db_password}@{self.db_host_name}:{self.db_port}/{self.db_name}"
 
 

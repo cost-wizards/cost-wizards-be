@@ -36,10 +36,9 @@ def generate_random_instance_id():
     return prefix + suffix
 
 
-flag = False
 instance_count = 0
 for index, row in df.iterrows():
-    if any(sub in row.iloc[1] for sub in ['t2.large', 't3.micro', 't4.nano']):
+    if any(sub in row.iloc[1] for sub in ['t3.nano']):
         payload['instance'][instance_count] = {}
         payload['instance'][instance_count]['name'] = row.iloc[0]
         payload['instance'][instance_count]['instance_id'] = generate_random_instance_id()
@@ -50,46 +49,33 @@ for index, row in df.iterrows():
         payload['instance'][instance_count]['on_demand_price'] = row.iloc[6]
 
         end_date = datetime.now() - timedelta(days=1)
-        start_date = end_date - timedelta(days=3 * 365)
+        start_date = end_date - timedelta(days=1370)
         timestamps = [timestamp.strftime('%Y-%m-%d %H:%M:%S') for timestamp in
                       pd.date_range(start=start_date, end=end_date, freq='H').to_list()]
         payload['instance'][instance_count]['instance_stats'] = {}
-        gg = 0
         for count, timestamp in enumerate(timestamps):
             print(f"Adding for {row.iloc[0]}-{count}")
             payload['instance'][instance_count]['instance_stats'][count] = {}
             payload['instance'][instance_count]['instance_stats'][count]['timestamp'] = timestamp
 
-            cpu_usage = [random.uniform(0.1, 60) for _ in range(360)]
-            payload['instance'][instance_count]['instance_stats'][count]['avg_cpu_usage'] = sum(cpu_usage) / len(
-                cpu_usage)
-            payload['instance'][instance_count]['instance_stats'][count]['max_cpu_usage'] = max(cpu_usage)
-            payload['instance'][instance_count]['instance_stats'][count]['min_cpu_usage'] = min(cpu_usage)
+            payload['instance'][instance_count]['instance_stats'][count]['max_cpu_usage'] = random.uniform(15, 60)
+            payload['instance'][instance_count]['instance_stats'][count]['min_cpu_usage'] = random.uniform(0.1, 5)
+            payload['instance'][instance_count]['instance_stats'][count]['avg_cpu_usage'] = random.uniform(payload['instance'][instance_count]['instance_stats'][count]['min_cpu_usage'],
+                                                                                                           payload['instance'][instance_count]['instance_stats'][count]['max_cpu_usage'])
 
-            mem_usage = [random.uniform(15, 80) for _ in range(360)]
-            payload['instance'][instance_count]['instance_stats'][count]['avg_mem_usage'] = sum(mem_usage) / len(
-                mem_usage)
-            payload['instance'][instance_count]['instance_stats'][count]['max_mem_usage'] = max(mem_usage)
-            payload['instance'][instance_count]['instance_stats'][count]['min_mem_usage'] = min(mem_usage)
+            payload['instance'][instance_count]['instance_stats'][count]['max_mem_usage'] = random.uniform(20, 80)
+            payload['instance'][instance_count]['instance_stats'][count]['min_mem_usage'] = random.uniform(5, 10)
+            payload['instance'][instance_count]['instance_stats'][count]['avg_mem_usage'] = random.uniform(payload['instance'][instance_count]['instance_stats'][count]['min_mem_usage'],
+                                                                                                           payload['instance'][instance_count]['instance_stats'][count]['max_mem_usage'])
+            payload['instance'][instance_count]['instance_stats'][count]['max_network_in'] = random.uniform(10000000, 65000000)
+            payload['instance'][instance_count]['instance_stats'][count]['min_network_in'] = random.uniform(1660, 65060)
+            payload['instance'][instance_count]['instance_stats'][count]['avg_network_in'] = random.uniform(payload['instance'][instance_count]['instance_stats'][count]['min_network_in'],
+                                                                                                            payload['instance'][instance_count]['instance_stats'][count]['max_network_in'])
 
-            network_in = [random.uniform(1660, 65000000) for _ in range(360)]
-            payload['instance'][instance_count]['instance_stats'][count]['avg_network_in'] = sum(network_in) / len(
-                network_in)
-            payload['instance'][instance_count]['instance_stats'][count]['max_network_in'] = max(network_in)
-            payload['instance'][instance_count]['instance_stats'][count]['min_network_in'] = min(network_in)
-
-            network_out = [random.uniform(5600, 300000) for _ in range(360)]
-            payload['instance'][instance_count]['instance_stats'][count]['avg_network_out'] = sum(network_out) / len(
-                network_out)
-            payload['instance'][instance_count]['instance_stats'][count]['max_network_out'] = max(network_out)
-            payload['instance'][instance_count]['instance_stats'][count]['min_network_out'] = min(network_out)
-            gg += 1
-            if gg > 1:
-                flag = True
-                break
-        if flag:
-            break
-        instance_count += 1
+            payload['instance'][instance_count]['instance_stats'][count]['max_network_out'] = random.uniform(100000, 300000)
+            payload['instance'][instance_count]['instance_stats'][count]['min_network_out'] = random.uniform(5600, 50000)
+            payload['instance'][instance_count]['instance_stats'][count]['avg_network_out'] = random.uniform(payload['instance'][instance_count]['instance_stats'][count]['min_network_out'],
+                                                                                                             payload['instance'][instance_count]['instance_stats'][count]['max_network_out'])
 
 
 def insert_payload(payload):
@@ -124,7 +110,7 @@ def insert_payload(payload):
             session.flush()
 
             # Insert InstanceStat details
-            for j, stat in payload['instance']['instance_stats'].items():
+            for j, stat in payload['instance'][i]['instance_stats'].items():
                 instance_stat = InstanceStat(
                     instance_id=inst.instance_id,
                     timestamp=stat['timestamp'],
