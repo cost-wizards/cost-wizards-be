@@ -25,9 +25,8 @@ class InstanceService:
         return ec2_instances
 
     def get_instances(self, session: Session, account_service: AccountService, *, account_id: int):
-        _account = account_service.get_account(session, id=account_id)
 
-        _instances = session.query(Instance).filter(Instance.account_id == _account.id).all()
+        _instances = session.query(Instance).filter(Instance.account_id == account_id).all()
 
         return _instances
 

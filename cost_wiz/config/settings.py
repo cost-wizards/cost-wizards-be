@@ -7,9 +7,9 @@ load_dotenv()
 
 
 class EnvSettings(BaseSettings):
-    aws_access_key_id: ty.Optional[str]
-    aws_secret_access_key: ty.Optional[str]
-    aws_session_token: ty.Optional[str]
+    aws_access_key_id: ty.Optional[str] = None
+    aws_secret_access_key: ty.Optional[str] = None
+    aws_session_token: ty.Optional[str] = None
 
     db_username: str
     db_password: str
