@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from cost_wiz.core.account.services import AccountService
-from cost_wiz.core.instances.schema import Ec2InstanceResponseSchema
+from cost_wiz.core.instances.schema import (Ec2InstanceResponseSchema,
+                                            InstanceRequestSchema)
 from cost_wiz.core.instances.services import InstanceService
 from cost_wiz.deps import get_db
 
@@ -38,3 +39,15 @@ def get_instance(
     session: Session = Depends(get_db),
 ):
     return service.get_instance(session, account_service, account_id=account_id, instance_id=id)
+
+
+@router.post("/account/{account_id}/select-instances")
+def select_instances(
+    account_id: int,
+    payload: list[InstanceRequestSchema],
+    session: Session = Depends(get_db),
+    service: InstanceService = Depends(),
+    account_service: AccountService = Depends(),
+):
+
+    return service.select_instances(session, account_service, account_id=account_id, payload=payload)

@@ -8,11 +8,7 @@ AWS_PRICES = {
         "instance_memory": "1GB",
         "network_performance": "Low to Moderate",
     },
-    "t3.large": {
-        "on_demand_price": "$0.0832 hourly",
-        "instance_memory": "8GB",
-        "network_performance": "Upto 5 Gigabit",
-    },
+    "t3.large": {},
 }
 
 
@@ -36,10 +32,9 @@ def get_instances(access_key: str, secret_key: str, session_token: str, region: 
                     "instance_id": instance["InstanceId"],
                     "instance_type": instance["InstanceType"],
                     "status": instance["State"]["Name"],
-                    "vcpu": str(instance["CpuOptions"]["CoreCount"]),
-                    "instance_memory": AWS_PRICES.get(instance["InstanceType"], {}).get("instance_memory"),
-                    "on_demand_price": AWS_PRICES.get(instance["InstanceType"], {}).get("on_demand_price"),
-                    "network_performance": AWS_PRICES.get(instance["InstanceType"], {}).get("network_performance"),
+                    "cpu": instance["CpuOptions"]["CoreCount"],
+                    "ram": AWS_PRICES.get(instance["InstanceType"], {}).get("memory"),
+                    "price": AWS_PRICES.get(instance["InstanceType"], {}).get("price"),
                 }
             )
 
