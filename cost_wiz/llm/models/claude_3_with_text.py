@@ -11,8 +11,6 @@ class Claude3Wrapper:
         self.model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
 
     def invoke_claude_3_with_text(self, prompt, max_tokens=2048):
-        print('prompt len', len(prompt))
-        print('prompt', prompt)
         try:
             response = self.client.invoke_model(
                 modelId=self.model_id,

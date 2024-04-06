@@ -5,11 +5,11 @@ def get_prompt(columns, data, instance):
         "SuggestedInstances": [
             {
                 "Instance": "t3.nano",
-                "Reason": "Based on the provided CPU utilization data, the t3.nano instance seems to be underutilized most of the time. The t3.micro instance offers more vCPUs and memory at a slightly higher cost, which can better handle the occasional spikes in CPU utilization.",
+                "Reason": "Based on the provided data, the t3.nano instance seems to be underutilized most of the time. The t3.micro instance offers more vCPUs and memory at a slightly higher cost, which can better handle the occasional spikes in CPU utilization.",
                 "CostDifferenceCostPerHour": {
                     "CurrentCostPerHour": 0.0052,
                     "SuggestedCostPerHour": 0.0104,
-                    "DifferenceCostPerHour": 0.0052,
+                    "DifferenceCostPerHour": -0.0052,
                 },
             },
             {
@@ -18,7 +18,7 @@ def get_prompt(columns, data, instance):
                 "CostDifferencePerHour": {
                     "CurrentCostPerHour": 0.0052,
                     "SuggestedCostPerHour": 0.0208,
-                    "DifferenceCostPerHour": 0.0156,
+                    "DifferenceCostPerHour": -0.0156,
                 },
             },
         ],
@@ -30,7 +30,7 @@ def get_prompt(columns, data, instance):
 
             Your task is to conduct a comprehensive analysis of the provided datasets, with a specific focus on evaluating the array of available EC2 instance types. 
             
-            This analysis should aim to identify a more cost-effective EC2 instance type that could serve as an optimized solution. 
+            This analysis should aim to identify a more cost-effective EC2 instance type that could serve as an optimized solution.
             
             In instances where the current EC2 instance type is deemed to be performing at an optimal level of efficiency, it is recommended to endorse the continuation of its use, justifying that the present EC2 instance type remains the most suited for the task.
 
@@ -64,9 +64,10 @@ def get_prompt(columns, data, instance):
               ]
             }}
             <json_example_format>
-
+            
             <data>{data}<data>
 
             <instance>{instance}<instance>
 
+            Remember the suggestions should be cost optimized.
             """
