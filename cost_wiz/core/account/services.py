@@ -2,8 +2,10 @@ from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from cost_wiz.config.settings import env
 from cost_wiz.core.account.schema import AccountCreateRequestSchema
 from cost_wiz.db import Account, Instance, Recommendation
+from cost_wiz.utils.utils import billing_data
 
 
 class AccountService:
@@ -14,14 +16,30 @@ class AccountService:
 
         optimization_runs = db.query(Recommendation.id).count()
 
-        data = db.query(Account, func.count(Instance.id)).group_by(Account.id).all()
+        total_cost_for_ec2 = billing_data(
+            env.aws_access_key_id, env.aws_secret_access_key, env.aws_session_token, env.aws_region_name
+        )
 
+        data = db.query(Account, func.count(Instance.id)).group_by(Account.id).all()
         print(data)
 
-        # return {
-        #     "connected_accounts": connected_accounts,
-        #     "optimization_runs": optimization_runs,
-        #     "data":        }
+        if data:
+
+            accounts, ec2_count = data[0]
+
+            return {
+                "connected_accounts": connected_accounts,
+                "optimization_runs": optimization_runs,
+                "data": accounts,
+                "ec2_count": ec2_count,
+            }
+
+        return {
+            "connected_accounts": connected_accounts,
+            "optimization_runs": optimization_runs,
+            "data": [],
+            "ec2_count": 0,
+        }
 
     def get_account(self, db: Session, id: int) -> Account:
         account = db.query(Account).filter(Account.id == id).one_or_none()
