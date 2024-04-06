@@ -8,13 +8,17 @@ from cost_wiz.core.llm.views import router as llm_router
 from cost_wiz.core.stats.views import router as stat_router
 
 app = FastAPI()
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+origins = [
+    "*"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],  
+)
 
 app.include_router(account_router)
 app.include_router(instance_router)
