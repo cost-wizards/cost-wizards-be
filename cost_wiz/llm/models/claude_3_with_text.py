@@ -40,6 +40,9 @@ class Claude3Wrapper:
                 self.logger.info(output["text"])
 
             if "```json" in output_list[0]["text"]:
+                # return json.loads(
+                #     re.search(r"(?<=```)\s*(.*?)\s*(?=```)", output_list[0]["text"], re.DOTALL).group(1).strip()
+                # )
                 return json.loads(re.search(r"```json(.*?)```", output_list[0]["text"], re.DOTALL).group(1).strip())
             else:
                 return json.loads(output_list[0]["text"])

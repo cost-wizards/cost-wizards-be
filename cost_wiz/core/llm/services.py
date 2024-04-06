@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from cost_wiz.core.instances.services import InstanceService
-from cost_wiz.db import InstanceStat
+from cost_wiz.db import InstanceStat, Recommendation
 from cost_wiz.llm.bedrock import get_text
 
 
@@ -41,6 +41,15 @@ class LLMService:
 
         try:
             response = get_text(columns, _data, instance)
+            session.add(
+                Recommendation(
+                    sug_2_diff_cost_per_hour=response["SuggestedInstances"][0]["CostDifferenceCostPerHour"][
+                        "SuggestedCostPerHour"
+                    ],
+                    account_id=account_id,
+                )
+            )
             return response
         except Exception as e:
+            print(e)
             raise HTTPException(status_code=400, detail="Could not process the request at the moment")
