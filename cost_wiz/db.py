@@ -86,3 +86,5 @@ class Recommendation(Base):
     sug_2_diff_cost_per_hour = Column(Float)
 
     account_id = Column(Integer, ForeignKey("account.id"))
+
+    count = Column(Integer)

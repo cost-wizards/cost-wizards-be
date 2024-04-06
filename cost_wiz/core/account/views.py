@@ -9,7 +9,7 @@ from cost_wiz.deps import get_db
 router = APIRouter()
 
 
-@router.get("/accounts", response_model=list[AccountResponseSchema])
+@router.get("/accounts")
 def get_accounts(service: AccountService = Depends(), db: Session = Depends(get_db)):
     return service.get_accounts(db)
 

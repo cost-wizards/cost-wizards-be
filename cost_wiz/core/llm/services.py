@@ -25,6 +25,7 @@ class LLMService:
             )
             .all()
         )
+        print(data, "=" * 10)
 
         columns = "timestamp, avg_cpu_usage, max_cpu_usage, min_cpu_usage, avg_mem_usage, max_mem_usage, min_mem_usage, avg_network_in, max_network_in, min_network_in, min_network_out, avg_network_out, max_network_out"
         _data = ""
