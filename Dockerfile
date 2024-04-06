@@ -8,6 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install dependencies
+COPY setup.py .
 RUN pip install .
 RUN apt-get update -y && \
     apt-get install -y  build-essential nginx python3-pip python3-dev  supervisor \
