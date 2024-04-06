@@ -75,6 +75,27 @@ class StatService:
 
         return memory_utilization
 
+    def __get_cumulative_price(self, _instance):
+        hourly_price = 10  # Example fixed hourly price
+
+        # Define the start and end timestamps
+        end_timestamp = datetime.now()
+        start_timestamp = end_timestamp - timedelta(days=90)  # Previous 3 months
+
+        # Generate timestamps and calculate cumulative hourly prices
+        timestamp = start_timestamp
+        cumulative_prices = []
+        cumulative_price = 0
+        while timestamp <= end_timestamp:
+            cumulative_price += hourly_price
+            cumulative_prices.append((timestamp, cumulative_price))
+            timestamp += timedelta(hours=1)
+
+        data = []
+        # Print the first few entries of cumulative prices
+        for timestamp, price in cumulative_prices[:10]:
+            data.append({"timestamp": timestamp, "price": price})
+
     def get_stats(self, session: Session, instance_id: int):
 
         _instance = session.query(Instance).filter(Instance.id == instance_id).one_or_none()
@@ -84,5 +105,8 @@ class StatService:
 
         cpu_utilization = self.__get_cpu_utilization(session, _instance)
         memory_utilization = self.__get_memory_utilization(session, _instance)
+        cumulative_price = self.__get_cumulative_price(_instance)
 
-        return {"cpu": cpu_utilization, "memory": memory_utilization}
+        return cumulative_price
+
+        return {"cpu": cpu_utilization, "memory": memory_utilization, "cumulative_price": cumulative_price}

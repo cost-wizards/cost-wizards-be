@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from cost_wiz.core.instances.services import InstanceService
-from cost_wiz.core.llm.services import LLMService
 from cost_wiz.core.stats.services import StatService
 from cost_wiz.deps import get_db
 
