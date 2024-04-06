@@ -32,10 +32,10 @@ class Claude3Wrapper:
             output_tokens = result["usage"]["output_tokens"]
             output_list = result.get("content", [])
 
-            self.logger.success("Invocation details:")
-            self.logger.success(f"- The input length is {input_tokens} tokens.")
-            self.logger.success(f"- The output length is {output_tokens} tokens.")
-            self.logger.success(f"- The model returned {len(output_list)} response(s):")
+            self.logger.info("Invocation details:")
+            self.logger.info(f"- The input length is {input_tokens} tokens.")
+            self.logger.info(f"- The output length is {output_tokens} tokens.")
+            self.logger.info(f"- The model returned {len(output_list)} response(s):")
             for output in output_list:
                 self.logger.info(output["text"])
 

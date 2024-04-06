@@ -16,7 +16,6 @@ setup(
         "loguru==0.7.2",
         "boto3==1.34.78",
         "botocore==1.34.78",
-        "pandas==1.3.4",
         "pydantic-settings==2.2.1",
         "SQLAlchemy==1.4.25",
         "fastapi",
@@ -24,5 +23,6 @@ setup(
         "psycopg2-binary==2.9.9",
         "alembic==1.7.3",
         "SQLAlchemy-Utils==0.37.8",
+        "darts==0.28.0",
     ],
 )
