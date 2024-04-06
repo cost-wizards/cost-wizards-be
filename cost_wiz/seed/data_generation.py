@@ -38,7 +38,7 @@ def generate_random_instance_id():
 
 instance_count = 0
 for index, row in df.iterrows():
-    if any(sub in row.iloc[1] for sub in ['t3.nano']):
+    if any(sub in row.iloc[1] for sub in ['t3.micro']):
         payload['instance'][instance_count] = {}
         payload['instance'][instance_count]['name'] = row.iloc[0]
         payload['instance'][instance_count]['instance_id'] = generate_random_instance_id()
@@ -48,8 +48,12 @@ for index, row in df.iterrows():
         payload['instance'][instance_count]['network_performance'] = row.iloc[5]
         payload['instance'][instance_count]['on_demand_price'] = row.iloc[6]
 
-        end_date = datetime.now() - timedelta(days=1)
-        start_date = end_date - timedelta(days=1370)
+        start_date_str = '2022-04-05 15:00:00'
+        end_date_str = '2023-04-05 15:00:00'
+
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d %H:%M:%S')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d %H:%M:%S')
+
         timestamps = [timestamp.strftime('%Y-%m-%d %H:%M:%S') for timestamp in
                       pd.date_range(start=start_date, end=end_date, freq='H').to_list()]
         payload['instance'][instance_count]['instance_stats'] = {}
@@ -58,13 +62,13 @@ for index, row in df.iterrows():
             payload['instance'][instance_count]['instance_stats'][count] = {}
             payload['instance'][instance_count]['instance_stats'][count]['timestamp'] = timestamp
 
-            payload['instance'][instance_count]['instance_stats'][count]['max_cpu_usage'] = random.uniform(15, 60)
+            payload['instance'][instance_count]['instance_stats'][count]['max_cpu_usage'] = random.uniform(6, 80)
             payload['instance'][instance_count]['instance_stats'][count]['min_cpu_usage'] = random.uniform(0.1, 5)
             payload['instance'][instance_count]['instance_stats'][count]['avg_cpu_usage'] = random.uniform(payload['instance'][instance_count]['instance_stats'][count]['min_cpu_usage'],
                                                                                                            payload['instance'][instance_count]['instance_stats'][count]['max_cpu_usage'])
 
-            payload['instance'][instance_count]['instance_stats'][count]['max_mem_usage'] = random.uniform(20, 80)
-            payload['instance'][instance_count]['instance_stats'][count]['min_mem_usage'] = random.uniform(5, 10)
+            payload['instance'][instance_count]['instance_stats'][count]['max_mem_usage'] = random.uniform(15, 80)
+            payload['instance'][instance_count]['instance_stats'][count]['min_mem_usage'] = random.uniform(1, 14)
             payload['instance'][instance_count]['instance_stats'][count]['avg_mem_usage'] = random.uniform(payload['instance'][instance_count]['instance_stats'][count]['min_mem_usage'],
                                                                                                            payload['instance'][instance_count]['instance_stats'][count]['max_mem_usage'])
             payload['instance'][instance_count]['instance_stats'][count]['max_network_in'] = random.uniform(10000000, 65000000)
