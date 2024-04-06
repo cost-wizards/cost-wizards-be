@@ -13,7 +13,6 @@ RUN pip install .
 RUN apt-get update -y && \
     apt-get install -y  build-essential nginx python3-pip python3-dev  supervisor \
     libpq-dev postgresql postgresql-contrib libldap2-dev libsasl2-dev freetds-dev uwsgi-plugin-python3 redis-server -y && \
-    pip install -r requirements.txt --no-cache-dir && \
     apt install -y awscli && \
     apt-get install -y curl && \
     apt-get install -y wget && \
