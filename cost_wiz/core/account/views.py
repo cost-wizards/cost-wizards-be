@@ -14,7 +14,7 @@ def get_accounts(service: AccountService = Depends(), db: Session = Depends(get_
     return service.get_accounts(db)
 
 
-@router.get("/accounts/{id}", response_model=AccountResponseSchema)
+@router.get("/accounts/{id}")
 def get_account(id: int, service: AccountService = Depends(), db: Session = Depends(get_db)):
     return service.get_account(db, id)
 

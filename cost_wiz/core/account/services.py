@@ -21,8 +21,6 @@ class AccountService:
         )
 
         data = db.query(Account, func.count(Instance.id)).group_by(Account.id).all()
-        print(data)
-
         if data:
 
             accounts, ec2_count = data[0]
@@ -32,6 +30,7 @@ class AccountService:
                 "optimization_runs": optimization_runs,
                 "data": accounts,
                 "ec2_count": ec2_count,
+                "total_ec2_cost": total_cost_for_ec2,
             }
 
         return {
@@ -39,15 +38,39 @@ class AccountService:
             "optimization_runs": optimization_runs,
             "data": [],
             "ec2_count": 0,
+            "total_ec2_cost": total_cost_for_ec2,
         }
 
-    def get_account(self, db: Session, id: int) -> Account:
+    def get_account(self, db: Session, id: int):
         account = db.query(Account).filter(Account.id == id).one_or_none()
 
         if not account:
             raise HTTPException(status_code=404, detail="Account not found")
 
-        return account
+        optimization_runs = db.query(Recommendation.id).filter(Recommendation.account_id == id).count()
+        total_cost_for_ec2 = billing_data(
+            env.aws_access_key_id, env.aws_secret_access_key, env.aws_session_token, env.aws_region_name
+        )
+
+        data = db.query(Account, func.count(Instance.id)).filter(Instance.account_id == id).group_by(Account.id).all()
+
+        if data:
+
+            accounts, ec2_count = data[0]
+
+            return {
+                "optimization_runs": optimization_runs,
+                "data": accounts,
+                "ec2_count": ec2_count,
+                "total_ec2_cost": total_cost_for_ec2,
+            }
+
+        return {
+            "optimization_runs": optimization_runs,
+            "data": None,
+            "ec2_count": 0,
+            "total_ec2_cost": total_cost_for_ec2,
+        }
 
     def create_account(self, db: Session, account: AccountCreateRequestSchema):
 
