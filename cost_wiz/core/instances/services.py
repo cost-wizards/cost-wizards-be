@@ -1,6 +1,8 @@
+from typing import List
+
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+
 from cost_wiz.core.account.services import AccountService
 from cost_wiz.core.instances.schema import InstanceRequestSchema
 from cost_wiz.db import Account, Instance
@@ -9,9 +11,9 @@ from cost_wiz.utils.utils import get_instances
 
 class InstanceService:
 
-    def get_available_instances(self, session: Session, account_service: AccountService, *, account_id: int):
+    def get_available_instances(self, session: Session, *, account_id: int):
 
-        _account: Account = account_service.get_account(session, id=account_id)
+        _account = session.query(Account).filter(Account.id == account_id).first()
 
         params = {
             "access_key": _account.access_key,
@@ -22,7 +24,18 @@ class InstanceService:
 
         ec2_instances: list[dict] = get_instances(**params)
 
-        return ec2_instances
+        for i, ec2 in enumerate(ec2_instances):
+            obj = Instance(
+                name=f"EC2-{i}",
+                instance_id=ec2["instance_id"],
+                instance_type=ec2["instance_type"],
+                vcpu=ec2["vcpu"],
+                instance_memory=ec2["instance_memory"],
+                on_demand_price=ec2["on_demand_price"],
+                network_performance=ec2["network_performance"],
+                account_id=account_id,
+            )
+            session.add(obj)
 
     def get_instances(self, session: Session, account_service: AccountService, *, account_id: int):
 
@@ -45,7 +58,7 @@ class InstanceService:
         account_service: AccountService,
         *,
         payload: List[InstanceRequestSchema],
-        account_id: int
+        account_id: int,
     ):
 
         account_service.get_account(session, id=account_id)

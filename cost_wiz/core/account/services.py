@@ -46,6 +46,7 @@ class AccountService:
                     "name": data.account_name,
                     "instance_count": data.instance_count,
                     "total_cost_for_ec2": total_cost_for_ec2,
+                    # "recommendation": data.recommendations,
                 }
             )
 
@@ -95,3 +96,5 @@ class AccountService:
 
         db.add(_account)
         db.flush()
+
+        return {"data": _account.id}
