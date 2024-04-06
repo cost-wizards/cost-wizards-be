@@ -21,7 +21,6 @@ class InstanceService:
         }
 
         ec2_instances: list[dict] = get_instances(**params)
-        print(ec2_instances)
 
         return ec2_instances
 
