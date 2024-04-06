@@ -31,8 +31,7 @@ class InstanceService:
 
         return _instances
 
-    def get_instance(self, session: Session, account_service: AccountService, *, account_id: int, instance_id: int):
-        account_service.get_account(session, id=account_id)
+    def get_instance(self, session: Session, *, account_id: int, instance_id: int):
 
         _instance = (
             session.query(Instance).filter(Instance.id == instance_id, Instance.account_id == account_id).one_or_none()

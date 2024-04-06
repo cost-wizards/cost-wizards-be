@@ -30,15 +30,14 @@ def get_instances(
     return service.get_instances(session, account_service, account_id=id)
 
 
-@router.post("/account/{account_id}/instance/{id}")
+@router.post("/instance/{id}")
 def get_instance(
     account_id: int,
     id: int,
     service: InstanceService = Depends(),
-    account_service: AccountService = Depends(),
     session: Session = Depends(get_db),
 ):
-    return service.get_instance(session, account_service, account_id=account_id, instance_id=id)
+    return service.get_instance(session, account_id=account_id, instance_id=id)
 
 
 @router.post("/account/{account_id}/select-instances")
