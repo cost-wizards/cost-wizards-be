@@ -30,11 +30,9 @@ class InstanceService:
 
         return _instances
 
-    def get_instance(self, session: Session, *, account_id: int, instance_id: int):
+    def get_instance(self, session: Session, *, instance_id: int):
 
-        _instance = (
-            session.query(Instance).filter(Instance.id == instance_id, Instance.account_id == account_id).one_or_none()
-        )
+        _instance = session.query(Instance).filter(Instance.id == instance_id).one_or_none()
 
         if not _instance:
             raise HTTPException(status_code=404, detail="Instance not found")
