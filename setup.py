@@ -16,7 +16,7 @@ setup(
         "loguru==0.7.2",
         "boto3==1.34.78",
         "botocore==1.34.78",
-        "pandas==1.3.4",
+        # "pandas==1.3.4",
         "pydantic-settings==2.2.1",
         "SQLAlchemy==1.4.25",
         "fastapi",

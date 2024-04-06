@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-
+from typing import List
 from cost_wiz.core.account.services import AccountService
 from cost_wiz.core.instances.schema import InstanceRequestSchema
 from cost_wiz.db import Account, Instance
@@ -44,7 +44,7 @@ class InstanceService:
         session: Session,
         account_service: AccountService,
         *,
-        payload: list[InstanceRequestSchema],
+        payload: List[InstanceRequestSchema],
         account_id: int
     ):
 

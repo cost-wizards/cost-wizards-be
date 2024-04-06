@@ -16,8 +16,6 @@ def get_text(columns, data, instance):
     )
     wrapper = Claude3Wrapper(client, logger)
     prompt = get_prompt(columns=columns, data=data, instance=instance)
-    with open("prmotp.txt", "a+") as file:
-        file.writelines(prompt)
     return wrapper.invoke_claude_3_with_text(prompt)
 
 
