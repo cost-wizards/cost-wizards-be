@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from cost_wiz.core.account.services import AccountService
+from cost_wiz.core.instances.schema import InstanceRequestSchema
 from cost_wiz.db import Account, Instance
 from cost_wiz.utils.utils import get_instances
 
@@ -20,6 +21,7 @@ class InstanceService:
         }
 
         ec2_instances: list[dict] = get_instances(**params)
+        print(ec2_instances)
 
         return ec2_instances
 
@@ -41,3 +43,32 @@ class InstanceService:
             raise HTTPException(status_code=404, detail="Instance not found")
 
         return _instance
+
+    def select_instances(
+        self,
+        session: Session,
+        account_service: AccountService,
+        *,
+        payload: list[InstanceRequestSchema],
+        account_id: int
+    ):
+
+        account_service.get_account(session, id=account_id)
+
+        _instances = []
+
+        for data in payload:
+            _instances.append(
+                Instance(
+                    instance_id=data.instance_id,
+                    instance_type=data.instance_type,
+                    vcpu=data.vcpu,
+                    instance_memory=data.instance_memory,
+                    network_performance=data.network_performance,
+                    on_demand_price=data.on_demand_price,
+                    status=data.status,
+                    account_id=account_id,
+                )
+            )
+
+        session.add_all(_instances)

@@ -4,10 +4,11 @@ from pydantic import BaseModel
 class Ec2InstanceResponseSchema(BaseModel):
     instance_id: str
     instance_type: str
+    vcpu: str
+    instance_memory: str
+    network_performance: str
+    on_demand_price: str
     status: str
-    cpu: int
-    ram: str
-    price: float
 
     class Config:
         from_attributes = True
@@ -25,3 +26,14 @@ class InstanceResponseSchema(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class InstanceRequestSchema(BaseModel):
+
+    instance_id: str
+    instance_type: str
+    vcpu: str
+    instance_memory: str
+    network_performance: str
+    on_demand_price: str
+    status: str
