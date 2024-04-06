@@ -28,7 +28,8 @@ def get_instances(access_key: str, secret_key: str, session_token: str, region: 
                     "instance_type": instance["InstanceType"],
                     "status": instance["State"]["Name"],
                     "cpu": instance["CpuOptions"]["CoreCount"],
-                    "ram": AWS_PRICES.get(instance["InstanceType"]),
+                    "ram": AWS_PRICES.get(instance["InstanceType"], {}).get("memory"),
+                    "price": AWS_PRICES.get(instance["InstanceType"], {}).get("price"),
                 }
             )
 

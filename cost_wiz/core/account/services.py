@@ -1,28 +1,24 @@
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from cost_wiz.core.account.schema import AccountCreateRequestSchema
 from cost_wiz.db import Account
-from cost_wiz.deps import get_db
 
 
 class AccountService:
 
-    def __init__(self, db: Session = Depends(get_db)) -> None:
-        self.db: Session = db
+    def get_accounts(self, db: Session):
+        return db.query(Account).all()
 
-    def get_accounts(self):
-        return self.db.query(Account).all()
-
-    def get_account(self, id: int):
-        account = self.db.query(Account).filter(Account.id == id).one_or_none()
+    def get_account(self, db: Session, id: int) -> Account:
+        account = db.query(Account).filter(Account.id == id).one_or_none()
 
         if not account:
             raise HTTPException(status_code=404, detail="Account not found")
 
         return account
 
-    def create_account(self, account: AccountCreateRequestSchema):
+    def create_account(self, db: Session, account: AccountCreateRequestSchema):
 
         _account = Account(
             name=account.name,
@@ -30,7 +26,8 @@ class AccountService:
             secret_key=account.secret_key,
             region=account.region,
             session_key=account.session_key,
+            has_account_setup=False,
         )
 
-        self.db.add(_account)
-        self.db.flush()
+        db.add(_account)
+        db.flush()
