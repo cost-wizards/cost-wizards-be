@@ -1,11 +1,12 @@
 from fastapi import HTTPException
-from sqlalchemy import func
+from sqlalchemy import Float, Integer, cast
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 
 from cost_wiz.config.settings import env
 from cost_wiz.core.account.schema import AccountCreateRequestSchema
-from cost_wiz.db import Account, Instance, Recommendation
-from cost_wiz.utils.utils import billing_data
+from cost_wiz.db import Account, Instance, InstanceStat, Recommendation
+from cost_wiz.utils.utils import billing_data, get_instances
 
 
 class AccountService:
@@ -27,6 +28,9 @@ class AccountService:
 
         parsed_data = []
 
+        result = db.query(func.sum(func.round(cast(Recommendation.sug_2_diff_cost_per_hour, Float)))).scalar()
+        recommendation_count = db.query(Recommendation.id).count()
+
         for data in query.all():
             access_key = data.access_key
             secret_key = data.secret_key
@@ -39,9 +43,10 @@ class AccountService:
             #     total_cost_for_ec2 = billing_data(access_key, secret_key, session_key, region)
             # except:
             #     pass
-
             parsed_data.append(
                 {
+                    "total_savings": result,
+                    "recommendation_count": recommendation_count,
                     "id": data.account_id,
                     "name": data.account_name,
                     "instance_count": data.instance_count,
@@ -95,3 +100,5 @@ class AccountService:
 
         db.add(_account)
         db.flush()
+
+        return {"data": _account.id}
