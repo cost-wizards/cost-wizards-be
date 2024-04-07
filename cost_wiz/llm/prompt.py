@@ -1,73 +1,144 @@
-def get_prompt(columns, data, instance):
+def get_prompt(data, instance):
 
-    example_json = {
-        "CurrentInstance": {"Instance": "t3.nano", "CostPerHour": 0.345},
+    cost_optimized_json_example_format = {
+        "CurrentInstance": {
+            "Instance": "t3.large",
+            "CostPerHour": 0.0832,
+            "Performance": "The t3.large instance provides 2 vCPUs and 8 GiB memory, which seems sufficient for the workload based on the provided dataset. However, there are periods of low utilization where a smaller instance might be more cost-effective."},
         "SuggestedInstances": [
             {
-                "Instance": "t3.nano",
-                "Reason": "Based on the provided data, the t3.nano instance seems to be underutilized most of the time. The t3.micro instance offers more vCPUs and memory at a slightly higher cost, which can better handle the occasional spikes in CPU utilization.",
+                "Instance": "t3.medium",
+                "Reason": "Based on the provided data, the t3.large instance seems to be underutilized most of the time. The t3.medium instance can be useful for such scenario at a slightly lower cost, which can better handle these kinds of occasional spikes in CPU utilization and memeory usage with better performance.",
                 "CostDifferenceCostPerHour": {
-                    "CurrentCostPerHour": 0.0052,
-                    "SuggestedCostPerHour": 0.0104,
-                    "DifferenceCostPerHour": -0.0052,
+                    "CurrentCostPerHour": 0.0832,
+                    "SuggestedCostPerHour": 0.0416,
+                    "DifferenceCostPerHour": 0.0416,
                 },
             },
             {
                 "Instance": "t3.small",
-                "Reason": "The t3.small instance provides even more vCPUs and memory compared to the t3.micro, which can handle higher CPU utilization spikes more comfortably. However, the cost is also higher.",
+                "Reason": "The t3.small instance provides same number of vCPUs with less memory as compared to the t3.large, which can handle higher CPU utilization spikes more comfortably. The cost is lowered.",
                 "CostDifferenceCostPerHour": {
-                    "CurrentCostPerHour": 0.0052,
+                    "CurrentCostPerHour": 0.0832,
                     "SuggestedCostPerHour": 0.0208,
-                    "DifferenceCostPerHour": -0.0156,
+                    "DifferenceCostPerHour": 0.0624,
+                },
+            },
+        ],
+    }
+
+    upgraded_json_example_format = {
+        "CurrentInstance": {"Instance": "t2.nano",
+                            "CostPerHour": 0.0058,
+                            "Performance": "The t3.micro instance provides 2 vCPUs and 1 GiB of memory, which seems sufficient for the provided dataset based on the average CPU and memory usage."},
+        "SuggestedInstances": [
+            {
+                "Instance": "t2.micro",
+                "Reason": "Based on the provided data, the t3.nano instance seems to be overutilized most of the time. The t3.micro instance can be useful for such scenario at a slightly more cost, which can better handle these kinds of spikes in CPU utilization and memeory usage with better performance.",
+                "CostDifferenceCostPerHour": {
+                    "CurrentCostPerHour": 0.0058,
+                    "SuggestedCostPerHour": 0.0116,
+                    "DifferenceCostPerHour": 0.0058,
+                },
+            },
+            {
+                "Instance": "t2.small",
+                "Reason": "A more better suggestion would be the t3.small instance provides same number of vCPUs with more memory as compared to the t3.nano, which can handle higher CPU utilization spikes more comfortably. The cost is however more than the current one..",
+                "CostDifferenceCostPerHour": {
+                    "CurrentCostPerHour": 0.0058,
+                    "SuggestedCostPerHour": 0.0230,
+                    "DifferenceCostPerHour": 0.0172,
                 },
             },
         ],
     }
     return f"""
-            The dataset you will be working with is framed within <data> tags, featuring time series data structured into columns: {columns}.
+            You are provided with a dataset encapsulated within <data> tags, which includes time series data organized in columns. Information about the Amazon EC2 instance type used to generate this dataset is enclosed within <instance> tags. Your primary objective is to analyze this dataset, focusing specifically on the efficiency and cost-effectiveness of the employed EC2 instance type.
 
-            Additionally, details regarding the EC2 instance type that was employed to generate this dataset are encapsulated within <instance> tags.
-
-            Your task is to conduct a comprehensive analysis of the provided datasets, with a specific focus on evaluating the array of available EC2 instance types.
-
-            This analysis should aim to identify a more cost-effective EC2 instance type that could serve as an optimized solution.
-
-            In instances where the current EC2 instance type is deemed to be performing at an optimal level of efficiency, it is recommended to endorse the continuation of its use, justifying that the present EC2 instance type remains the most suited for the task.
-
-            Please ensure to recommend a minimum of two alternative EC2 instance types. Your recommendations should be presented in a strict JSON only format, as illustrated within the <json_example_format> tags provided below.
-
-            <json_example_format>
+            Your analysis should:
+            
+            1. Evaluate the dataset to understand its demands and resource usage.
+            2. Compare the current EC2 instance type against available options, considering both cost and performance.
+            3. Recommend at least two alternative EC2 instance types that either reduce costs without sacrificing performance or enhance performance if the current instance is underperforming, even if at a higher cost.
+            4. Justify the continuation of the current EC2 instance type if it is deemed the most suitable option in terms of cost-efficiency and performance.
+            
+            Please format your recommendations only as a JSON object, similar to the provided examples. Your JSON output should include:
+            
+            - The current EC2 instance type, its cost per hour, and details about its performance.
+            - At least two suggested EC2 instance types with rationale for each suggestion, including a comparison of cost per hour and performance impact.
+            
+            An example format for cost-optimized recommendations is shown within <cost_optimized_json_example_format> tags, and an example for suggesting an upgrade due to performance needs is within <upgraded_json_example_format> tags. Replace placeholder values with specific details from your analysis.
+            
+            Ensure your suggestions aim for cost optimization and address the dataset's requirements effectively.
+            
+            <cost_optimized_json_example_format>
             {{
               "CurrentInstance": {{
-                "Instance": "{example_json["CurrentInstance"]["Instance"]}",
-                "CostPerHour": {example_json["CurrentInstance"]["CostPerHour"]}
+                "Instance": "{cost_optimized_json_example_format["CurrentInstance"]["Instance"]}",
+                "CostPerHour": {cost_optimized_json_example_format["CurrentInstance"]["CostPerHour"]}
+                "Performance": {cost_optimized_json_example_format["CurrentInstance"]["Performance"]}
               }},
               "SuggestedInstances": [
                 {{
-                  "Instance": "{example_json["SuggestedInstances"][0]["Instance"]}",
-                  "Reason": "{example_json["SuggestedInstances"][0]["Reason"]}",
+                  "Instance": "{cost_optimized_json_example_format["SuggestedInstances"][0]["Instance"]}",
+                  "Reason": "{cost_optimized_json_example_format["SuggestedInstances"][0]["Reason"]}",
                   "CostDifferenceCostPerHour": {{
-                    "CurrentCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
-                    "SuggestedCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
-                    "DifferenceCostPerHour": {example_json["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
+                    "CurrentCostPerHour": {cost_optimized_json_example_format["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
+                    "SuggestedCostPerHour": {cost_optimized_json_example_format["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
+                    "DifferenceCostPerHour": {cost_optimized_json_example_format["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
                   }}
                 }},
                 {{
-                  "Instance": "{example_json["SuggestedInstances"][1]["Instance"]}",
-                  "Reason": "{example_json["SuggestedInstances"][1]["Reason"]}",
+                  "Instance": "{cost_optimized_json_example_format["SuggestedInstances"][1]["Instance"]}",
+                  "Reason": "{cost_optimized_json_example_format["SuggestedInstances"][1]["Reason"]}",
                   "CostDifferenceCostPerHour": {{
-                    "CurrentCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
-                    "SuggestedCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
-                    "DifferenceCostPerHour": {example_json["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
+                    "CurrentCostPerHour": {cost_optimized_json_example_format["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
+                    "SuggestedCostPerHour": {cost_optimized_json_example_format["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
+                    "DifferenceCostPerHour": {cost_optimized_json_example_format["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
                   }}
                 }}
               ]
             }}
-            <json_example_format>
+            </cost_optimized_json_example_format>
+            
+            <upgraded_json_example_format>
+            {{
+              "CurrentInstance": {{
+                "Instance": "{upgraded_json_example_format["CurrentInstance"]["Instance"]}",
+                "CostPerHour": {upgraded_json_example_format["CurrentInstance"]["CostPerHour"]},
+                "Performance": {cost_optimized_json_example_format["CurrentInstance"]["Performance"]}
+              }},
+              "SuggestedInstances": [
+                {{
+                  "Instance": "{upgraded_json_example_format["SuggestedInstances"][0]["Instance"]}",
+                  "Reason": "{upgraded_json_example_format["SuggestedInstances"][0]["Reason"]}",
+                  "CostDifferenceCostPerHour": {{
+                    "CurrentCostPerHour": {upgraded_json_example_format["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
+                    "SuggestedCostPerHour": {upgraded_json_example_format["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
+                    "DifferenceCostPerHour": {upgraded_json_example_format["SuggestedInstances"][0]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
+                  }}
+                }},
+                {{
+                  "Instance": "{upgraded_json_example_format["SuggestedInstances"][1]["Instance"]}",
+                  "Reason": "{upgraded_json_example_format["SuggestedInstances"][1]["Reason"]}",
+                  "CostDifferenceCostPerHour": {{
+                    "CurrentCostPerHour": {upgraded_json_example_format["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["CurrentCostPerHour"]},
+                    "SuggestedCostPerHour": {upgraded_json_example_format["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["SuggestedCostPerHour"]},
+                    "DifferenceCostPerHour": {upgraded_json_example_format["SuggestedInstances"][1]["CostDifferenceCostPerHour"]["DifferenceCostPerHour"]}
+                  }}
+                }}
+              ]
+            }}
+            </upgraded_json_example_format>
+            
+            <data>
+            {data}
+            </data>
+            
+            <instance>
+            {instance}
+            </instance>
+            
+            Focus on making recommendations that are both cost-optimized and suitable for the dataset's needs.
 
-            <data>{data}<data>
-
-            <instance>{instance}<instance>
-
-            Remember the suggestions should be cost optimized.
             """

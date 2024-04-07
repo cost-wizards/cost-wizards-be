@@ -15,7 +15,7 @@ def get_text(columns, data, instance):
         region_name=env.aws_region_name,
     )
     wrapper = Claude3Wrapper(client, logger)
-    prompt = get_prompt(columns=columns, data=data, instance=instance)
+    prompt = get_prompt(data=data, instance=instance)
     return wrapper.invoke_claude_3_with_text(prompt)
 
 
